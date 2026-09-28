@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BLACK IRON BURGERS — Online Menu</title>
+<style>
+:root{--bg:#080808;--panel:#111;--line:#292929;--text:#fff;--muted:#a7a7a7}
+*{box-sizing:border-box}body{margin:0;background:#080808;color:var(--text);font-family:Inter,Arial,sans-serif}button,input,select,textarea{font:inherit}
+header{position:sticky;top:0;z-index:5;background:rgba(8,8,8,.95);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+.nav{max-width:1100px;margin:auto;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:15px}.brand{font-weight:900;letter-spacing:-1px}.navlinks{display:flex;gap:18px;font-size:13px}.navlinks a{color:#fff;text-decoration:none}
+.hero{max-width:1100px;margin:auto;padding:70px 20px 45px;border-bottom:1px solid var(--line)}.eyebrow{font-size:12px;letter-spacing:3px;color:#aaa}.hero h1{font-size:clamp(42px,9vw,86px);line-height:.9;margin:15px 0;max-width:850px;letter-spacing:-5px}.hero p{color:#aaa;max-width:550px;line-height:1.6}.location{font-size:13px;color:#ddd}
+.wrap{max-width:1100px;margin:auto;padding:28px 20px}.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:25px}.search{flex:1;min-width:220px;background:#111;border:1px solid var(--line);color:#fff;padding:13px 15px;border-radius:8px;outline:none}.cats{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.cats button,.ghost{background:#111;border:1px solid var(--line);color:#fff;padding:10px 14px;border-radius:7px;white-space:nowrap;cursor:pointer}.cats button.active{background:#fff;color:#000}
+.sectiontitle{display:flex;justify-content:space-between;align-items:end;margin:35px 0 15px}.sectiontitle h2{margin:0;font-size:25px}.sectiontitle span{color:#777;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{background:#111;border:1px solid var(--line);border-radius:10px;overflow:hidden;cursor:pointer}.card img{width:100%;height:190px;object-fit:cover;display:block;filter:saturate(.75)}.cardbody{padding:15px}.card h3{margin:0 0 6px;font-size:17px}.card p{margin:0 0 14px;color:#929292;font-size:13px;line-height:1.45}.price{font-weight:800}
+.cartbar{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:10;background:#fff;color:#000;border:0;border-radius:9px;padding:14px 18px;font-weight:800;display:none;box-shadow:0 10px 35px #000}.cartbar.show{display:block;cursor:pointer}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:end;justify-content:center;z-index:20}.modal.show{display:flex}.sheet{background:#111;border:1px solid var(--line);width:min(620px,100%);max-height:90vh;overflow:auto;border-radius:16px 16px 0 0;padding:22px}.sheet img{width:100%;height:230px;object-fit:cover;border-radius:10px}.close{float:right;background:#222;color:#fff;border:0;border-radius:50%;width:34px;height:34px;cursor:pointer}.sheet h2{margin:18px 0 6px}.sheet p{color:#aaa;line-height:1.5}.field{display:block;margin:13px 0;color:#bbb;font-size:13px}.field input,.field select,.field textarea{width:100%;margin-top:6px;background:#0a0a0a;color:#fff;border:1px solid var(--line);padding:12px;border-radius:7px}.primary{width:100%;background:#fff;color:#000;border:0;padding:14px;border-radius:8px;font-weight:800;cursor:pointer;margin-top:8px}
+.cartitem{display:flex;justify-content:space-between;gap:15px;border-bottom:1px solid var(--line);padding:12px 0}.cartitem small{color:#888}.qty{display:flex;align-items:center;gap:8px}.qty button{background:#222;color:#fff;border:0;border-radius:5px;width:28px;height:28px;cursor:pointer}
+footer{border-top:1px solid var(--line);margin-top:60px;padding:30px 20px;color:#777;font-size:12px}.footerin{max-width:1100px;margin:auto;display:flex;justify-content:space-between;gap:20px}
+@media(max-width:720px){.navlinks{display:none}.hero{padding-top:50px}.grid{grid-template-columns:1fr 1fr}.card img{height:150px}.hero h1{letter-spacing:-3px}.footerin{flex-direction:column}}
+@media(max-width:470px){.grid{grid-template-columns:1fr}.card img{height:190px}}
+</style>
+</head>
+<body>
+<header><div class="nav"><div class="brand">BLACK IRON</div><nav class="navlinks"><a href="#menu">Menu</a><a href="#specials">Specials</a><a href="#info">Info</a><a href="#" onclick="openOrders();return false">Orders</a></nav><button class="ghost" onclick="openCart()">Cart (<span id="count">0</span>)</button></div></header>
+
+<section class="hero"><div class="eyebrow">AUSTIN, TEXAS · EST. 2026</div><h1>BLACK IRON<br>BURGERS.</h1><p>Smash burgers, crisp fries and cold shakes. Built fresh. Served fast.</p><div class="location">Pickup & delivery available · 11 AM — 11 PM</div></section>
+
+<main class="wrap" id="menu">
+<div class="tools"><input class="search" id="search" placeholder="Search burgers, fries, shakes..." oninput="render()"></div>
+<div class="cats" id="cats"></div>
+<div class="sectiontitle" id="specials"><h2>Menu</h2><span id="resultCount"></span></div>
+<div class="grid" id="grid"></div>
+</main>
+
+<div class="cartbar" id="cartbar" onclick="openCart()">View cart · <span id="total">$0.00</span></div>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="sheet" id="sheet"></div></div>
+
+<footer id="info"><div class="footerin"><span>BLACK IRON BURGERS · Austin, TX</span><span>Online menu & ordering experience by Obsiden</span></div></footer>
+
+<script>
+const items=[
+{id:1,c:"Smash Burgers",name:"Black Iron Classic",desc:"Two smashed beef patties, American cheese, pickles, onion and house sauce.",p:12.99,img:"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80"},
+{id:2,c:"Smash Burgers",name:"Double Stack",desc:"Two crispy-edged patties, double cheese, grilled onion and signature sauce.",p:14.99,img:"https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=900&q=80"},
+{id:3,c:"Smash Burgers",name:"Iron BBQ",desc:"Smashed beef, cheddar, smoked BBQ sauce, crispy onions and pickles.",p:15.49,img:"https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?auto=format&fit=crop&w=900&q=80"},
+{id:4,c:"Combos",name:"Classic Combo",desc:"Black Iron Classic, fries and a fountain drink.",p:17.49,img:"https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?auto=format&fit=crop&w=900&q=80"},
+{id:5,c:"Sides",name:"Crispy Fries",desc:"Golden fries with sea salt.",p:4.49,img:"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=900&q=80"},
+{id:6,c:"Sides",name:"Loaded Iron Fries",desc:"Fries, cheese sauce, grilled onions and house sauce.",p:7.49,img:"https://images.unsplash.com/photo-1585109649139-366815a0d713?auto=format&fit=crop&w=900&q=80"},
+{id:7,c:"Drinks",name:"Fountain Drink",desc:"Choose from Coke, Diet Coke, Sprite or Dr Pepper.",p:2.49,img:"https://images.unsplash.com/photo-1629203851122-3726ecdf080e?auto=format&fit=crop&w=900&q=80"},
+{id:8,c:"Shakes",name:"Vanilla Shake",desc:"Classic thick vanilla shake.",p:6.49,img:"https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=900&q=80"},
+{id:9,c:"Shakes",name:"Chocolate Shake",desc:"Rich chocolate shake with whipped cream.",p:6.49,img:"https://images.unsplash.com/photo-1579954115545-a95591f28bfc?auto=format&fit=crop&w=900&q=80"}
+];
+let cart=JSON.parse(localStorage.getItem("bi_cart")||"[]"), current=null, cat="All";
+const money=n=>"$"+n.toFixed(2);
+function cats(){let cs=["All",...new Set(items.map(x=>x.c))];document.getElementById("cats").innerHTML=cs.map(x=>'<button class="'+(x===cat?"active":"")+'" onclick="cat=\''+x+'\';render()">'+x+"</button>").join("")}
+function render(){cats();let q=document.getElementById("search").value.toLowerCase();let list=items.filter(x=>(cat==="All"||x.c===cat)&&(x.name+" "+x.desc).toLowerCase().includes(q));document.getElementById("resultCount").textContent=list.length+" items";document.getElementById("grid").innerHTML=list.map(x=>'<article class="card" onclick="openItem('+x.id+')"><img src="'+x.img+'" alt=""><div class="cardbody"><h3>'+x.name+'</h3><p>'+x.desc+'</p><span class="price">'+money(x.p)+"</span></div></article>").join("")}
+function openItem(id){current=items.find(x=>x.id===id);document.getElementById("sheet").innerHTML='<button class="close" onclick="closeModal()">×</button><img src="'+current.img+'" alt=""><h2>'+current.name+'</h2><p>'+current.desc+'</p><b>'+money(current.p)+'</b><label class="field">Special instructions<textarea id="note" rows="3" placeholder="No onions, extra sauce..."></textarea></label><label class="field">Quantity<input id="qty" type="number" min="1" value="1"></label><button class="primary" onclick="addCurrent()">Add to cart · '+money(current.p)+'</button>';document.getElementById("modal").classList.add("show")}
+function closeModal(){document.getElementById("modal").classList.remove("show")}
+function addCurrent(){let q=Math.max(1,parseInt(document.getElementById("qty").value)||1),note=document.getElementById("note").value.trim();let found=cart.find(x=>x.id===current.id&&x.note===note);if(found)found.q+=q;else cart.push({id:current.id,q,note});save();closeModal()}
+function save(){localStorage.setItem("bi_cart",JSON.stringify(cart));let n=cart.reduce((a,x)=>a+x.q,0),t=cart.reduce((a,x)=>a+items.find(i=>i.id===x.id).p*x.q,0);document.getElementById("count").textContent=n;document.getElementById("total").textContent=money(t);document.getElementById("cartbar").classList.toggle("show",n>0)}
+function openCart(){let rows=cart.map((x,i)=>{let it=items.find(y=>y.id===x.id);return '<div class="cartitem"><div><b>'+it.name+'</b><br><small>'+money(it.p)+' × '+x.q+(x.note?" · "+x.note:"")+'</small></div><div class="qty"><button onclick="change('+i+',-1)">−</button><b>'+x.q+'</b><button onclick="change('+i+',1)">+</button></div></div>'}).join("");let total=cart.reduce((a,x)=>a+items.find(i=>i.id===x.id).p*x.q,0);document.getElementById("sheet").innerHTML='<button class="close" onclick="closeModal()">×</button><h2>Your cart</h2>'+ (rows||"<p>Your cart is empty.</p>") + (cart.length?'<h3>Total · '+money(total)+'</h3><button class="primary" onclick="checkout()">Continue to checkout</button>':"");document.getElementById("modal").classList.add("show")}
+function change(i,d){cart[i].q+=d;if(cart[i].q<=0)cart.splice(i,1);save();openCart()}
+function checkout(){document.getElementById("sheet").innerHTML='<button class="close" onclick="openCart()">×</button><h2>Checkout</h2><label class="field">Name<input id="name" placeholder="Your name"></label><label class="field">Order type<select id="type" onchange="toggleAddress()"><option>Pickup</option><option>Delivery</option></select></label><div id="addressBox" style="display:none"><label class="field">Delivery address<input id="address" placeholder="Street, city, ZIP"></label></div><label class="field">Payment<select><option>Pay at restaurant</option><option>Card at pickup</option></select></label><p style="font-size:12px;color:#777">Demo checkout — no payment is processed.</p><button class="primary" onclick="placeOrder()">Place demo order</button>';document.getElementById("modal").classList.add("show")}
+function toggleAddress(){document.getElementById("addressBox").style.display=document.getElementById("type").value==="Delivery"?"block":"none"}
+function placeOrder(){let name=document.getElementById("name").value.trim()||"Guest";let orders=JSON.parse(localStorage.getItem("bi_orders")||"[]");orders.unshift({date:new Date().toLocaleString(),name,total:cart.reduce((a,x)=>a+items.find(i=>i.id===x.id).p*x.q,0)});localStorage.setItem("bi_orders",JSON.stringify(orders));cart=[];save();document.getElementById("sheet").innerHTML='<h2>Order received.</h2><p>Thanks, '+name+'. This is a demo experience, so no payment or real order was submitted.</p><button class="primary" onclick="closeModal()">Back to menu</button>'}
+function openOrders(){let o=JSON.parse(localStorage.getItem("bi_orders")||"[]");document.getElementById("sheet").innerHTML='<button class="close" onclick="closeModal()">×</button><h2>Order history</h2>'+(o.length?o.map(x=>'<p><b>'+x.name+'</b><br><small>'+x.date+' · '+money(x.total)+'</small></p>').join(""):"<p>No previous demo orders.</p>");document.getElementById("modal").classList.add("show")}
+render();save();
+</script>
+</body>
+</html>
